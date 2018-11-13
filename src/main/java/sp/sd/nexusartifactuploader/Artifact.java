@@ -20,13 +20,15 @@ public class Artifact extends AbstractDescribableImpl<Artifact> implements Seria
     private final String type;
     private final String classifier;
     private final String file;
+    private final String pomFile;
 
     @DataBoundConstructor
-    public Artifact(String artifactId, String type, String classifier, String file) {
+    public Artifact(String artifactId, String type, String classifier, String file, String pomFile) {
         this.artifactId = artifactId;
         this.type = type;
         this.classifier = classifier;
         this.file = file != null ? file.trim() : null;
+        this.pomFile = pomFile != null ? pomFile.trim() : null;
     }
 
     public String getArtifactId() {
@@ -43,6 +45,10 @@ public class Artifact extends AbstractDescribableImpl<Artifact> implements Seria
 
     public String getFile() {
         return file;
+    }
+
+    public String getPomFile() {
+        return pomFile;
     }
 
     @Extension
@@ -77,5 +83,10 @@ public class Artifact extends AbstractDescribableImpl<Artifact> implements Seria
             }
             return FormValidation.ok();
         }
+
+        public FormValidation doCheckPomFile(@QueryParameter String value) {
+            return FormValidation.ok();
+        }
+
     }
 }

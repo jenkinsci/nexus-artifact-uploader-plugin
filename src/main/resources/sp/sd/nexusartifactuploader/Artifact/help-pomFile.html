@@ -1,0 +1,3 @@
+<div>File path in the workspace. ex:<i>${WORKSPACE}/&lt;module&gt;/pom.xml</i>.  Adding the pom file uploads the pom.xml to Nexus thereby given dependency information when the artifact is used.
+    In multi-module maven projects, if variables are used for version numbers then you should create a separate artifact.  This artifact's <code>ArtifactId</code> should match the artifactId in the root pom.xml.
+    The <code>Type</code> set to <i>pom</i> and the <code>File</code> (not Pom File) pointing to the root pom.xml</div>

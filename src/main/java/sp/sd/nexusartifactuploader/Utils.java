@@ -19,7 +19,7 @@ public final class Utils {
                                          String ResolvedGroupId, String ResolvedArtifactId, String ResolvedVersion,
                                          String ResolvedRepository, String ResolvedType,
                                          String ResolvedClassifier, String ResolvedProtocol,
-                                         String ResolvedNexusVersion) throws IOException {
+                                         String ResolvedNexusVersion, File pomFile) throws IOException {
         Boolean result = false;
         if (Strings.isNullOrEmpty(ResolvedNexusUrl)) {
             Listener.getLogger().println("Url of the Nexus is empty. Please enter Nexus Url.");
@@ -33,6 +33,9 @@ public final class Utils {
             Listener.getLogger().println("Type: " + ResolvedType);
             Listener.getLogger().println("Version: " + ResolvedVersion);
             Listener.getLogger().println("File: " + artifactFile.getName());
+            if (pomFile != null) {
+                Listener.getLogger().println("Pom file: " + pomFile.getName());
+            }
             Listener.getLogger().println("Repository:" + ResolvedRepository);
             String repositoryPath = "/content/repositories/";
             if (ResolvedNexusVersion.contentEquals("nexus3")) {
@@ -41,8 +44,9 @@ public final class Utils {
             ArtifactRepositoryManager artifactRepositoryManager = new ArtifactRepositoryManager(ResolvedProtocol + "://"
                     + ResolvedNexusUrl + repositoryPath + ResolvedRepository, ResolvedNexusUser,
                     ResolvedNexusPassword, ResolvedRepository, Listener);
-            artifactRepositoryManager.upload(ResolvedGroupId, ResolvedArtifactId, ResolvedVersion,
-                    artifactFile, ResolvedType, ResolvedClassifier);
+
+            artifactRepositoryManager.upload(ResolvedGroupId, ResolvedArtifactId, ResolvedVersion, artifactFile, ResolvedType, ResolvedClassifier, pomFile);
+
             Listener.getLogger().println("Uploading artifact " + artifactFile.getName() + " completed.");
             result = true;
         } catch (Exception e) {

@@ -30,6 +30,7 @@ import sp.sd.nexusartifactuploader.NexusArtifactUploader;
                 type('jar')
                 classifier('debug')
                 file('nexus-artifact-uploader.jar')
+                pomFile('pom.xml')
             }
             artifact {
                 artifactId('nexus-artifact-uploader')

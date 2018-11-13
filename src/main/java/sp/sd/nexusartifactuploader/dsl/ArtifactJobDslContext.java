@@ -11,6 +11,7 @@ public class ArtifactJobDslContext implements Context {
     String type;
     String classifier;
     String file;
+    String pomFile;
 
     void artifactId(String artifactId) {
         this.artifactId = artifactId;
@@ -28,4 +29,7 @@ public class ArtifactJobDslContext implements Context {
         this.file = file;
     }
 
+    public String pomFile() {
+        return pomFile;
+    }
 }

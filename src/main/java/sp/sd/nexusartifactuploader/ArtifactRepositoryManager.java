@@ -52,13 +52,16 @@ public class ArtifactRepositoryManager {
                 .setAuthentication(new Authentication(this.username, this.password));
     }
 
-    public void upload(String groupId, String artifactId, String version,
-                       File artifactFile, String type, String classifier)
-            throws Exception {
+    public void upload(String groupId, String artifactId, String version, File artifactFile, String type, String classifier, File pomFile) throws Exception {
+
         RemoteRepository remoteRepository = makeRemoteRepository();
-        Artifact artifact = new DefaultArtifact(groupId, artifactId, classifier,
-                type, version).setFile(artifactFile);
+        Artifact artifact = new DefaultArtifact(groupId, artifactId, classifier, type, version).setFile(artifactFile);
         DeployRequest deployRequest = new DeployRequest().addArtifact(artifact);
+
+        if (pomFile != null) {
+            Artifact pomArtifact = new DefaultArtifact(groupId, artifactId, classifier, "pom", version).setFile(pomFile);
+            deployRequest.addArtifact(pomArtifact);
+        }
 
         deployRequest.setRepository(remoteRepository);
 
