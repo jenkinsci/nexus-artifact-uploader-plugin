@@ -29,7 +29,7 @@ public class ArtifactJobDslContext implements Context {
         this.file = file;
     }
 
-    public String pomFile() {
-        return pomFile;
+    void pomFile(String pomFile) {
+        this.pomFile = pomFile;
     }
 }
