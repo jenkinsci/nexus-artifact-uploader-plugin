@@ -14,6 +14,9 @@
         <f:entry title="File" field="file">
             <f:textbox/>
         </f:entry>
+        <f:entry title="Pom File" field="pomFile">
+            <f:textbox/>
+        </f:entry>
         <f:entry>
             <div align="right">
                 <f:repeatableDeleteButton/>

@@ -23,6 +23,7 @@ Uploading snapshots is not supported by this plugin.
                 type('jar')
                 classifier('debug')
                 file('nexus-artifact-uploader.jar')
+                pomFile('pom.xml')
             }
             artifact {
                 artifactId('nexus-artifact-uploader')
@@ -48,6 +49,7 @@ Uploading snapshots is not supported by this plugin.
             [artifactId: projectName,
              classifier: '',
              file: 'my-service-' + version + '.jar',
+             pomFile: 'pom.xml'
              type: 'jar']
         ]
      )

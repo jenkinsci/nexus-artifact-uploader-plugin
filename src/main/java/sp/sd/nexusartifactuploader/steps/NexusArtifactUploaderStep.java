@@ -236,11 +236,22 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
             Item project = build.getParent();
             EnvVars envVars = build.getEnvironment(listener);
             for (Artifact artifact : step.artifacts) {
+
                 FilePath artifactFilePath = new FilePath(ws, build.getEnvironment(listener).expand(artifact.getFile()));
                 if (!artifactFilePath.exists()) {
                     listener.getLogger().println(artifactFilePath.getName() + " file doesn't exists");
                     throw new IOException(artifactFilePath.getName() + " file doesn't exists");
                 } else {
+
+                    FilePath artifactPomFilePath = null;
+                    if (artifact.getPomFile() != null && artifact.getPomFile().trim().length() > 0) {
+                        artifactPomFilePath = new FilePath(ws, build.getEnvironment(listener).expand(artifact.getPomFile()));
+                        if (!artifactPomFilePath.exists()) {
+                            listener.getLogger().println(artifactPomFilePath.getName() + " pom file doesn't exists");
+                            throw new IOException(artifactPomFilePath.getName() + " pom file doesn't exists");
+                        }
+                    }
+
                     result = artifactFilePath.act(new ArtifactFileCallable(listener,
                             step.getUsername(envVars, project),
                             step.getPassword(envVars, project),
@@ -252,7 +263,8 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
                             envVars.expand(artifact.getType()),
                             envVars.expand(artifact.getClassifier()),
                             step.getProtocol(),
-                            step.getNexusVersion()
+                            step.getNexusVersion(),
+                            artifactPomFilePath
                     ));
                 }
                 if (!result) {
@@ -279,12 +291,14 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
         private final String resolvedClassifier;
         private final String resolvedProtocol;
         private final String resolvedNexusVersion;
+        private final FilePath artifactPomFilePath;
 
         public ArtifactFileCallable(TaskListener Listener, String ResolvedNexusUser, String ResolvedNexusPassword,
                                     String ResolvedNexusUrl, String ResolvedGroupId, String ResolvedArtifactId,
                                     String ResolvedVersion, String ResolvedRepository,
                                     String ResolvedType, String ResolvedClassifier,
-                                    String ResolvedProtocol, String ResolvedNexusVersion) {
+                                    String ResolvedProtocol, String ResolvedNexusVersion,
+                                    FilePath artifactPomFilePath) {
             this.listener = Listener;
             this.resolvedNexusUser = ResolvedNexusUser;
             this.resolvedNexusPassword = ResolvedNexusPassword;
@@ -297,13 +311,20 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
             this.resolvedClassifier = ResolvedClassifier;
             this.resolvedProtocol = ResolvedProtocol;
             this.resolvedNexusVersion = ResolvedNexusVersion;
+            this.artifactPomFilePath = artifactPomFilePath;
         }
 
         @Override
         public Boolean invoke(File artifactFile, VirtualChannel channel) throws IOException {
+
+            File pomFile = null;
+            if (artifactPomFilePath.getRemote() != null) {
+                pomFile = new File(artifactPomFilePath.getRemote());
+            }
+
             return Utils.uploadArtifact(artifactFile, listener, resolvedNexusUser, resolvedNexusPassword, resolvedNexusUrl,
                     resolvedGroupId, resolvedArtifactId, resolvedVersion, resolvedRepository,
-                    resolvedType, resolvedClassifier, resolvedProtocol, resolvedNexusVersion);
+                    resolvedType, resolvedClassifier, resolvedProtocol, resolvedNexusVersion, pomFile);
         }
 
         @Override

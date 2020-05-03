@@ -55,7 +55,7 @@ public class NexusArtifactUploaderJobDslContext implements Context {
     void artifact(@DslContext(ArtifactJobDslContext.class) Closure artifactClosure) {
         ArtifactJobDslContext context = new ArtifactJobDslContext();
         executeInContext(artifactClosure, context);
-        Artifact artifact = new Artifact(context.artifactId, context.type, context.classifier, context.file);
+        Artifact artifact = new Artifact(context.artifactId, context.type, context.classifier, context.file, context.pomFile);
         artifactList.add(artifact);
     }
 }

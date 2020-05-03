@@ -15,7 +15,7 @@ public class ArtifactTest {
     @WithoutJenkins
     public void testDefaults() {
         Artifact artifact = new Artifact("nexus-artifact-uploader", "jpi", "debug",
-                "target/nexus-artifact-uploader.jpi");
+                "target/nexus-artifact-uploader.jpi", "pom.xml");
         assertEquals("nexus-artifact-uploader", artifact.getArtifactId());
         assertEquals("jpi", artifact.getType());
         assertEquals("debug", artifact.getClassifier());
@@ -26,7 +26,7 @@ public class ArtifactTest {
     @WithoutJenkins
     public void testFileNameTrimming() {
         Artifact artifact = new Artifact("nexus-artifact-uploader", "jpi", "debug",
-                "target/nexus-artifact-uploader.jpi ");
+                "target/nexus-artifact-uploader.jpi ", "pom.xml");
         assertEquals("target/nexus-artifact-uploader.jpi", artifact.getFile());
     }
 }
