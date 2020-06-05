@@ -140,13 +140,14 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
 
     @Override
     public void perform(Run build, FilePath workspace, Launcher launcher, final TaskListener listener) throws IOException, InterruptedException {
-        EnvVars envVars = build.getEnvironment(listener);
+        final EnvVars envVars = build.getEnvironment(listener);
         Item project = build.getParent();
         final String username = getUsername(envVars, project);
         final String password = getPassword(envVars, project);
         final String nexusUrl = envVars.expand(getNexusUrl());
         final String repository = envVars.expand(getRepository());
         final String expandedVersion = envVars.expand(getVersion());
+        final String expandedGroupId = envVars.expand(getGroupId());
 
         if (artifacts == null || artifacts.size() == 0) {
             throw new IOException("No artifacts defined. Artifacts must be defined in addition to group id. See https://plugins.jenkins.io/nexus-artifact-uploader");
@@ -154,7 +155,7 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
 
         final Map<Artifact, String> artifacts = new LinkedHashMap<Artifact, String>();
         for (Artifact artifact : this.artifacts) {
-            FilePath artifactFilePath = new FilePath(workspace, build.getEnvironment(listener).expand(artifact.getFile()));
+            FilePath artifactFilePath = new FilePath(workspace, envVars.expand(artifact.getFile()));
             artifacts.put(artifact, artifactFilePath.getRemote());
         }
 
@@ -171,7 +172,7 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
                         listener.getLogger().println(file.getName() + " file doesn't exists");
                         throw new IOException(file.getName() + " file doesn't exists");
                     } else {
-                        nexusArtifacts.add(Utils.toArtifact(artifact, groupId, expandedVersion, file));
+                        nexusArtifacts.add(Utils.toArtifact(artifact.expandVars(envVars), expandedGroupId, expandedVersion, file));
                     }
                 }
                 return Utils.uploadArtifacts(listener, username, password,

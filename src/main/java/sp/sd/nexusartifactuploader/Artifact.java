@@ -1,5 +1,6 @@
 package sp.sd.nexusartifactuploader;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -7,6 +8,7 @@ import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
+import javax.annotation.CheckReturnValue;
 import java.io.Serializable;
 
 /**
@@ -27,6 +29,16 @@ public class Artifact extends AbstractDescribableImpl<Artifact> implements Seria
         this.type = type;
         this.classifier = classifier;
         this.file = file != null ? file.trim() : null;
+    }
+
+    /**
+     * Produce a new artifact with its fields expanded with the given env variables
+     */
+    @CheckReturnValue
+    public Artifact expandVars(EnvVars envVars) {
+        return new Artifact(
+            envVars.expand(artifactId), envVars.expand(type), envVars.expand(classifier), envVars.expand(file)
+        );
     }
 
     public String getArtifactId() {

@@ -237,15 +237,16 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
         @Override
         protected Boolean run() throws Exception {
             Item project = build.getParent();
-            EnvVars envVars = build.getEnvironment(listener);
+            final EnvVars envVars = build.getEnvironment(listener);
             final String username = step.getUsername(envVars, project);
             final String password = step.getPassword(envVars, project);
             final String nexusUrl = envVars.expand(step.getNexusUrl());
             final String repository = envVars.expand(step.getRepository());
+            final String groupId = envVars.expand(step.getGroupId());
+            final String version = envVars.expand(step.getVersion());
+            // These do not need expansion, as they are chosen from a finite list
             final String protocol = step.getProtocol();
             final String nexusVersion = step.getNexusVersion();
-            final String groupId = step.getGroupId();
-            final String version = envVars.expand(step.getVersion());
             final TaskListener listener = this.listener;
 
             final Map<Artifact, String> artifacts = new LinkedHashMap<Artifact, String>();
@@ -268,7 +269,7 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
                             listener.getLogger().println(file.getName() + " file doesn't exists");
                             throw new IOException(file.getName() + " file doesn't exists");
                         } else {
-                            nexusArtifacts.add(Utils.toArtifact(artifact, groupId, version, file));
+                            nexusArtifacts.add(Utils.toArtifact(artifact.expandVars(envVars), groupId, version, file));
                         }
                     }
                     return Utils.uploadArtifacts(listener, username, password,
