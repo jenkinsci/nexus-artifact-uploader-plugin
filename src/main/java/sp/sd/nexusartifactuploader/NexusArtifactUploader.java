@@ -47,9 +47,8 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
     private final String repository;
     private final List<Artifact> artifacts;
 
-    private final
     @CheckForNull
-    String credentialsId;
+    private final String credentialsId;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
@@ -93,9 +92,8 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
         return artifacts;
     }
 
-    public
     @Nullable
-    String getCredentialsId() {
+    public String getCredentialsId() {
         return credentialsId;
     }
 
@@ -141,7 +139,7 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
     @Override
     public void perform(Run build, FilePath workspace, Launcher launcher, final TaskListener listener) throws IOException, InterruptedException {
         final EnvVars envVars = build.getEnvironment(listener);
-        Item project = build.getParent();
+        final Item project = build.getParent();
         final String username = getUsername(envVars, project);
         final String password = getPassword(envVars, project);
         final String nexusUrl = envVars.expand(getNexusUrl());
@@ -153,10 +151,10 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
             throw new IOException("No artifacts defined. Artifacts must be defined in addition to group id. See https://plugins.jenkins.io/nexus-artifact-uploader");
         }
 
-        final Map<Artifact, String> artifacts = new LinkedHashMap<Artifact, String>();
+        final Map<Artifact, File> artifactToFile = new LinkedHashMap<>();
         for (Artifact artifact : this.artifacts) {
             FilePath artifactFilePath = new FilePath(workspace, envVars.expand(artifact.getFile()));
-            artifacts.put(artifact, artifactFilePath.getRemote());
+            artifactToFile.put(artifact.expandVars(envVars), new File(artifactFilePath.getRemote()));
         }
 
         workspace.act(new Callable<Boolean, IOException>() {
@@ -164,15 +162,15 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
 
             @Override
             public Boolean call() throws IOException {
-                final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts = new ArrayList<org.sonatype.aether.artifact.Artifact>(artifacts.size());
-                for (final Map.Entry<Artifact, String> entry : artifacts.entrySet()) {
+                final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts = new ArrayList<>(artifactToFile.size());
+                for (final Map.Entry<Artifact, File> entry : artifactToFile.entrySet()) {
                     Artifact artifact = entry.getKey();
-                    File file = new File(entry.getValue());
+                    File file = entry.getValue();
                     if (!file.exists()) {
-                        listener.getLogger().println(file.getName() + " file doesn't exists");
-                        throw new IOException(file.getName() + " file doesn't exists");
+                        listener.getLogger().println(file.getName() + " file doesn't exist");
+                        throw new IOException(file.getName() + " file doesn't exist");
                     } else {
-                        nexusArtifacts.add(Utils.toArtifact(artifact.expandVars(envVars), expandedGroupId, expandedVersion, file));
+                        nexusArtifacts.add(Utils.toArtifact(artifact, expandedGroupId, expandedVersion, file));
                     }
                 }
                 return Utils.uploadArtifacts(listener, username, password,

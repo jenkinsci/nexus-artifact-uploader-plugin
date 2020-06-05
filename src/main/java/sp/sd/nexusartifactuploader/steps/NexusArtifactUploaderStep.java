@@ -21,12 +21,10 @@ import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
-import hudson.remoting.VirtualChannel;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
-import jenkins.MasterToSlaveFileCallable;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -56,9 +54,8 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
     private final String repository;
     private final List<Artifact> artifacts;
 
-    private final
     @CheckForNull
-    String credentialsId;
+    private final String credentialsId;
 
     @DataBoundConstructor
     public NexusArtifactUploaderStep(String nexusVersion, String protocol, String nexusUrl, String groupId,
@@ -101,9 +98,8 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
         return artifacts;
     }
 
-    public
     @Nullable
-    String getCredentialsId() {
+    public String getCredentialsId() {
         return credentialsId;
     }
 
@@ -219,6 +215,8 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
     }
 
     public static final class Execution extends AbstractSynchronousNonBlockingStepExecution<Boolean> {
+        private static final long serialVersionUID = 1L;
+
         @Inject
         private transient NexusArtifactUploaderStep step;
 
@@ -236,7 +234,7 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
 
         @Override
         protected Boolean run() throws Exception {
-            Item project = build.getParent();
+            final Item project = build.getParent();
             final EnvVars envVars = build.getEnvironment(listener);
             final String username = step.getUsername(envVars, project);
             final String password = step.getPassword(envVars, project);
@@ -249,27 +247,26 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
             final String nexusVersion = step.getNexusVersion();
             final TaskListener listener = this.listener;
 
-            final Map<Artifact, String> artifacts = new LinkedHashMap<Artifact, String>();
+            final Map<Artifact, File> artifactToFile = new LinkedHashMap<>();
             for (Artifact artifact : step.artifacts) {
-                FilePath artifactFilePath = new FilePath(ws, build.getEnvironment(listener).expand(artifact.getFile()));
-                artifacts.put(artifact, artifactFilePath.getRemote());
+                FilePath artifactFilePath = new FilePath(ws, envVars.expand(artifact.getFile()));
+                artifactToFile.put(artifact.expandVars(envVars), new File(artifactFilePath.getRemote()));
             }
 
             return ws.act(new Callable<Boolean, Exception>() {
                 private static final long serialVersionUID = 1L;
 
-
                 @Override
                 public Boolean call() throws Exception {
-                    final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts = new ArrayList<org.sonatype.aether.artifact.Artifact>(artifacts.size());
-                    for (final Map.Entry<Artifact, String> entry : artifacts.entrySet()) {
+                    final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts = new ArrayList<>(artifactToFile.size());
+                    for (final Map.Entry<Artifact, File> entry : artifactToFile.entrySet()) {
                         Artifact artifact = entry.getKey();
-                        File file = new File(entry.getValue());
+                        File file = entry.getValue();
                         if (!file.exists()) {
-                            listener.getLogger().println(file.getName() + " file doesn't exists");
-                            throw new IOException(file.getName() + " file doesn't exists");
+                            listener.getLogger().println(file.getName() + " file doesn't exist");
+                            throw new IOException(file.getName() + " file doesn't exist");
                         } else {
-                            nexusArtifacts.add(Utils.toArtifact(artifact.expandVars(envVars), groupId, version, file));
+                            nexusArtifacts.add(Utils.toArtifact(artifact, groupId, version, file));
                         }
                     }
                     return Utils.uploadArtifacts(listener, username, password,
@@ -283,7 +280,5 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
                 }
             });
         }
-
-        private static final long serialVersionUID = 1L;
     }
 }
