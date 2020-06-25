@@ -34,7 +34,7 @@ public final class Utils {
             for (Artifact artifact : artifacts) {
                 Listener.getLogger().println("Uploading artifact " + artifact.getFile().getName() + " started....");
                 Listener.getLogger().println("GroupId: " + artifact.getGroupId());
-                Listener.getLogger().println("ArtifactId: " + artifact.getGroupId());
+                Listener.getLogger().println("ArtifactId: " + artifact.getArtifactId());
                 Listener.getLogger().println("Classifier: " + artifact.getClassifier());
                 Listener.getLogger().println("Type: " + artifact.getExtension());
                 Listener.getLogger().println("Version: " + artifact.getVersion());
