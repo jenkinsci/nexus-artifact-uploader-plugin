@@ -24,7 +24,7 @@ public final class Utils {
     public static Boolean uploadArtifacts(TaskListener Listener, String ResolvedNexusUser,
                                          String ResolvedNexusPassword, String ResolvedNexusUrl,
                                          String ResolvedRepository, String ResolvedProtocol,
-                                         String ResolvedNexusVersion, Artifact... artifacts) {
+                                         String ResolvedNexusVersion, Artifact... artifacts) throws IOException {
         Boolean result = false;
         if (Strings.isNullOrEmpty(ResolvedNexusUrl)) {
             Listener.getLogger().println("Url of the Nexus is empty. Please enter Nexus Url.");
@@ -57,6 +57,7 @@ public final class Utils {
             result = true;
         } catch (Exception e) {
             Listener.getLogger().println(e.getMessage());
+            throw new IOException(e.getMessage());
         }
         return result;
     }
