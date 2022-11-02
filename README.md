@@ -1,4 +1,4 @@
-# nexus-artifact-uploader
+# Nexus Artifact Uploader
 
 This plugin goal is to upload artifacts generated from non-maven projects to Nexus
 
@@ -6,8 +6,9 @@ This plugin now supports Nexus-2.x & Nexus-3.x.
 
 Uploading snapshots is not supported by this plugin.
 
-# Job DSL example
+### Job DSL example
 
+```groovy
     freeStyleJob('NexusArtifactUploaderJob') {
         steps {
           nexusArtifactUploader {
@@ -33,9 +34,11 @@ Uploading snapshots is not supported by this plugin.
           }
         }
     }
+```
 
 # Jenkins pipeline example
 
+```groovy
     nexusArtifactUploader(
         nexusVersion: 'nexus3',
         protocol: 'http',
@@ -51,3 +54,4 @@ Uploading snapshots is not supported by this plugin.
              type: 'jar']
         ]
      )
+```

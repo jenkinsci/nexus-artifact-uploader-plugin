@@ -13,8 +13,8 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.google.common.base.Strings;
 import hudson.*;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.inject.Inject;
 
 import hudson.model.Item;

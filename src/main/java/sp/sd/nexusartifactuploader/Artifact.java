@@ -8,7 +8,7 @@ import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import javax.annotation.CheckReturnValue;
+import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 import java.io.Serializable;
 
 /**

@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 import org.jenkinsci.remoting.RoleChecker;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
