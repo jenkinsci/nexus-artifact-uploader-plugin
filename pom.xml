@@ -19,6 +19,7 @@
         <jenkins.version>2.319.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <maven.version>3.8.6</maven.version>
+        <wagon.version>3.5.2</wagon.version>
     </properties>
 
     <name>Nexus Artifact Uploader</name>
@@ -69,7 +70,7 @@
             <dependency>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-provider-api</artifactId>
-                <version>2.1</version>
+                <version>${wagon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
@@ -163,7 +164,7 @@
         <dependency>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-http</artifactId>
-            <version>2.1</version>
+            <version>${wagon.version}</version>
         </dependency>
     </dependencies>
     <build>
