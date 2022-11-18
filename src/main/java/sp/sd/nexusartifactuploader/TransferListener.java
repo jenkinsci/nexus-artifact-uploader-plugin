@@ -1,11 +1,11 @@
 package sp.sd.nexusartifactuploader;
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import hudson.model.TaskListener;
 import org.slf4j.Logger;
@@ -18,12 +18,12 @@ import org.apache.commons.lang3.Validate;
 
 public class TransferListener extends AbstractTransferListener {
     Logger logger = LoggerFactory.getLogger(TransferListener.class);
-    private Map<TransferResource, Long> downloads = new ConcurrentHashMap<TransferResource, Long>();
+    private ConcurrentMap<TransferResource, Long> downloads = new ConcurrentHashMap<>();
     private int lastLength;
     private TaskListener Listener;
 
     static class FileSizeFormat {
-        static enum ScaleUnit {
+        enum ScaleUnit {
             BYTE {
                 @Override
                 public long bytes() {
@@ -62,8 +62,6 @@ public class TransferListener extends AbstractTransferListener {
                 public long bytes() {
                     return MEGABYTE.bytes() * KILOBYTE.bytes();
                 }
-
-                ;
 
                 @Override
                 public String symbol() {
@@ -133,7 +131,7 @@ public class TransferListener extends AbstractTransferListener {
 
         public String formatProgress(long progressedSize, long size) {
             Validate.isTrue(progressedSize >= 0L, "Progressed file size cannot be negative: %s", progressedSize);
-            Validate.isTrue(size >= 0L && progressedSize <= size || size < 0L,
+            Validate.isTrue(size < 0L || progressedSize <= size,
                     "Progressed file size cannot be bigger than size: %s > %s", progressedSize, size);
 
             if (size >= 0 && progressedSize != size) {

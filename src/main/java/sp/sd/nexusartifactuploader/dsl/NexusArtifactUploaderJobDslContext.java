@@ -3,7 +3,6 @@ package sp.sd.nexusartifactuploader.dsl;
 import groovy.lang.Closure;
 import javaposse.jobdsl.dsl.Context;
 import javaposse.jobdsl.dsl.DslContext;
-import javaposse.jobdsl.plugin.DslExtensionMethod;
 import sp.sd.nexusartifactuploader.Artifact;
 
 import java.util.ArrayList;

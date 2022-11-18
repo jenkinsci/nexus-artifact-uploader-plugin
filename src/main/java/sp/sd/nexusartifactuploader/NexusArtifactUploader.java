@@ -32,7 +32,6 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.google.common.base.Strings;
 
 
@@ -115,7 +114,7 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
     public static StandardUsernameCredentials lookupSystemCredentials(String credentialsId, Item project) {
         return CredentialsMatchers.firstOrNull(
                 CredentialsProvider
-                        .lookupCredentials(StandardUsernameCredentials.class, project, ACL.SYSTEM, Collections.<DomainRequirement>emptyList()),
+                        .lookupCredentials(StandardUsernameCredentials.class, project, ACL.SYSTEM, Collections.emptyList()),
                 CredentialsMatchers.withId(credentialsId)
         );
     }
@@ -238,7 +237,7 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
             if (owner == null || !owner.hasPermission(Item.CONFIGURE)) {
                 return new ListBoxModel();
             }
-            return new StandardUsernameListBoxModel().withEmptySelection().withAll(CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials.class, owner, ACL.SYSTEM, Collections.<DomainRequirement>emptyList()));
+            return new StandardUsernameListBoxModel().withEmptySelection().withAll(CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials.class, owner, ACL.SYSTEM, Collections.emptyList()));
         }
 
         public ListBoxModel doFillNexusVersionItems() {
