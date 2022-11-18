@@ -1,26 +1,15 @@
-# Mac OS X files
-.DS_Store
+target
 
-# Intellij files
+# mvn hpi:run
+work
+
+# IntelliJ IDEA project files
 *.iml
-.idea/*
-classes
+*.iws
+*.ipr
+.idea
 
-# Maven
-target/*
-pom.xml.releaseBackup
-release.properties
-
-# Jenkins workplace files
-work*
-
-# Gradle
-.gradle
-build
-libsrc/*
-
-# Eclipse
-/.classpath
-/.project
-/.settings*
-/target/
+# Eclipse project files
+.settings
+.classpath
+.project
