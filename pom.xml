@@ -18,7 +18,7 @@
         <changelist>-SNAPSHOT</changelist>
         <jenkins.version>2.319.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <maven.version>3.8.6</maven.version>
+        <maven.version>3.8.7</maven.version>
         <wagon.version>3.5.2</wagon.version>
     </properties>
 
