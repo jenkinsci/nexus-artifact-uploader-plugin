@@ -18,8 +18,8 @@
         <changelist>-SNAPSHOT</changelist>
         <jenkins.version>2.319.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <maven.version>3.8.6</maven.version>
-        <wagon.version>3.5.2</wagon.version>
+        <maven.version>3.9.0</maven.version>
+        <wagon.version>3.5.3</wagon.version>
     </properties>
 
     <name>Nexus Artifact Uploader</name>
