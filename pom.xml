@@ -16,7 +16,7 @@
     <properties>
         <revision>2.15</revision>
         <changelist>-SNAPSHOT</changelist>
-        <jenkins.version>2.319.3</jenkins.version>
+        <jenkins.version>2.361.4</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <maven.version>3.9.0</maven.version>
         <wagon.version>3.5.3</wagon.version>
@@ -62,8 +62,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.319.x</artifactId>
-                <version>1654.vcb_69d035fa_20</version>
+                <artifactId>bom-2.361.x</artifactId>
+                <version>2102.v854b_fec19c92</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
