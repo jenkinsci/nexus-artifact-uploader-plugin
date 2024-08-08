@@ -16,7 +16,7 @@
     <properties>
         <revision>2.15</revision>
         <changelist>-SNAPSHOT</changelist>
-        <jenkins.version>2.319.3</jenkins.version>
+        <jenkins.version>2.414.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <maven.version>3.8.6</maven.version>
         <wagon.version>3.5.2</wagon.version>
@@ -62,8 +62,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.319.x</artifactId>
-                <version>1654.vcb_69d035fa_20</version>
+                <artifactId>bom-2.414.x</artifactId>
+                <version>2977.vdf61ecb_fb_e2d</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -87,11 +87,6 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jenkins.plugins</groupId>
-            <artifactId>commons-httpclient3-api</artifactId>
-            <version>3.1-3</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
