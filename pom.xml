@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.51</version>
+        <version>4.88</version>
         <relativePath />
     </parent>
     <groupId>sp.sd</groupId>
@@ -17,11 +17,11 @@
         <revision>2.15</revision>
         <changelist>-SNAPSHOT</changelist>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-        <jenkins.baseline>2.319</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
+        <jenkins.baseline>2.361</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.4</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <maven.version>3.8.6</maven.version>
-        <wagon.version>3.5.2</wagon.version>
+        <maven.version>3.9.6</maven.version>
+        <wagon.version>3.5.3</wagon.version>
     </properties>
 
     <name>Nexus Artifact Uploader</name>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>1654.vcb_69d035fa_20</version>
+                <version>2102.v854b_fec19c92</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
