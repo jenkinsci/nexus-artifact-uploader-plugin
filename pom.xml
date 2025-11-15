@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.51</version>
+        <version>5.28</version>
         <relativePath />
     </parent>
     <groupId>sp.sd</groupId>
@@ -16,10 +16,14 @@
     <properties>
         <revision>2.15</revision>
         <changelist>-SNAPSHOT</changelist>
-        <jenkins.version>2.414.3</jenkins.version>
+        <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
+        <jenkins.baseline>2.504</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <maven.version>3.8.6</maven.version>
-        <wagon.version>3.5.2</wagon.version>
+        <hpi.bundledArtifacts>aether-api,aether-connector-asynchttpclient,aether-connector-file,aether-connector-wagon,aether-impl,aether-spi,aether-util,async-http-client,javax.inject,maven-aether-provider,maven-builder-support,maven-model,maven-model-builder,maven-repository-metadata,maven-settings,maven-settings-builder,netty,plexus-cipher,plexus-classworlds,plexus-component-annotations,plexus-interpolation,plexus-sec-dispatcher,plexus-utils,sisu-inject-bean,sisu-inject-plexus,wagon-http,wagon-http-shared,wagon-provider-api</hpi.bundledArtifacts>
+        <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
+        <maven.version>3.9.6</maven.version>
+        <wagon.version>3.5.3</wagon.version>
     </properties>
 
     <name>Nexus Artifact Uploader</name>
@@ -33,13 +37,6 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <id>pskumar448</id>
-            <name>Suresh Kumar</name>
-            <email>pskumar448@gmail.com</email>
-        </developer>
-    </developers>
     <scm>
         <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
@@ -62,8 +59,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.414.x</artifactId>
-                <version>2977.vdf61ecb_fb_e2d</version>
+                <artifactId>bom-${jenkins.baseline}.x</artifactId>
+                <version>5681.v79d2ddf61465</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -75,7 +72,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -91,7 +88,6 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>job-dsl</artifactId>
-            <version>1.81</version>
             <optional>true</optional>
         </dependency>
         <dependency>
