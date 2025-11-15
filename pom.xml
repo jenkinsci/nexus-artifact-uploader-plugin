@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.88</version>
+        <version>5.28</version>
         <relativePath />
     </parent>
     <groupId>sp.sd</groupId>
@@ -17,9 +17,11 @@
         <revision>2.15</revision>
         <changelist>-SNAPSHOT</changelist>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-        <jenkins.baseline>2.361</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.4</jenkins.version>
+        <jenkins.baseline>2.504</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
+        <hpi.bundledArtifacts>aether-api,aether-connector-asynchttpclient,aether-connector-file,aether-connector-wagon,aether-impl,aether-spi,aether-util,async-http-client,javax.inject,maven-aether-provider,maven-builder-support,maven-model,maven-model-builder,maven-repository-metadata,maven-settings,maven-settings-builder,netty,plexus-cipher,plexus-classworlds,plexus-component-annotations,plexus-interpolation,plexus-sec-dispatcher,plexus-utils,sisu-inject-bean,sisu-inject-plexus,wagon-http,wagon-http-shared,wagon-provider-api</hpi.bundledArtifacts>
+        <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
         <maven.version>3.9.6</maven.version>
         <wagon.version>3.5.3</wagon.version>
     </properties>
@@ -35,13 +37,6 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <id>pskumar448</id>
-            <name>Suresh Kumar</name>
-            <email>pskumar448@gmail.com</email>
-        </developer>
-    </developers>
     <scm>
         <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
@@ -65,7 +60,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>2102.v854b_fec19c92</version>
+                <version>5681.v79d2ddf61465</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -98,7 +93,6 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>job-dsl</artifactId>
-            <version>1.81</version>
             <optional>true</optional>
         </dependency>
         <dependency>
