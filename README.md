@@ -1,6 +1,6 @@
 # Nexus Artifact Uploader
 
-This plugin goal is to upload artifacts generated from non-maven projects to Nexus
+This plugin uploads artifacts generated from non-maven projects to Nexus.
 
 This plugin now supports Nexus-2.x & Nexus-3.x.
 
@@ -55,3 +55,8 @@ Uploading snapshots is not supported by this plugin.
         ]
      )
 ```
+
+## Changelog in [GitHub Releases](https://github.com/jenkinsci/nexus-artifact-uploader-plugin/releases)
+
+Release notes have been recorded in [GitHub Releases](https://github.com/jenkinsci/nexus-artifact-uploader-plugin/releases) since 2.14.
+Prior release notes were recorded in the [change log file](https://github.com/jenkinsci/nexus-artifact-uploader-plugin/blob/nexus-artifact-uploader-2.14/CHANGELOG.md).
