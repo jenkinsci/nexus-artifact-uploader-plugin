@@ -1,19 +1,13 @@
 package sp.sd.nexusartifactuploader;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
-import org.jvnet.hudson.test.WithoutJenkins;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ArtifactTest {
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+class ArtifactTest {
 
     @Test
-    @WithoutJenkins
-    public void testDefaults() {
+    void testDefaults() {
         Artifact artifact = new Artifact("nexus-artifact-uploader", "jpi", "debug",
                 "target/nexus-artifact-uploader.jpi");
         assertEquals("nexus-artifact-uploader", artifact.getArtifactId());
@@ -23,8 +17,7 @@ public class ArtifactTest {
     }
 
     @Test
-    @WithoutJenkins
-    public void testFileNameTrimming() {
+    void testFileNameTrimming() {
         Artifact artifact = new Artifact("nexus-artifact-uploader", "jpi", "debug",
                 "target/nexus-artifact-uploader.jpi ");
         assertEquals("target/nexus-artifact-uploader.jpi", artifact.getFile());
