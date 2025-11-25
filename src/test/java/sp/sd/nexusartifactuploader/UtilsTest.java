@@ -24,63 +24,60 @@
 package sp.sd.nexusartifactuploader;
 
 import hudson.model.TaskListener;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.sonatype.aether.artifact.Artifact;
 
-public class UtilsTest {
+class UtilsTest {
 
-    public UtilsTest() {
-    }
+    private static final String ARTIFACT_ID = "my-id";
+    private static final String CLASSIFIER = "test";
+    private static final String ARTIFACT_TYPE = "a-type";
+    private static final String FILE_NAME = "my-file";
+    private static final sp.sd.nexusartifactuploader.Artifact ARTIFACT = new sp.sd.nexusartifactuploader.Artifact(ARTIFACT_ID, ARTIFACT_TYPE, CLASSIFIER, FILE_NAME);
+    private static final String GROUP_ID = "my-groupId";
+    private static final String VERSION = "0.0.1";
+    private static final File ARTIFACT_FILE = new File(".");
 
-    private final String artifactId = "my-id";
-    private final String classifier = "test";
-    private final String artifactType = "a-type";
-    private final String fileName = "my-file";
-    private final sp.sd.nexusartifactuploader.Artifact artifact = new sp.sd.nexusartifactuploader.Artifact(artifactId, artifactType, classifier, fileName);
-    private final String groupId = "my-groupId";
-    private final String version = "0.0.1";
-    private final File artifactFile = new File(".");
+    private static final TaskListener TASK_LISTENER = TaskListener.NULL;
+    private static final String USER_NAME = "userName";
+    private static final String PASSWORD = "password";
+    private static final String HOSTNAME = "nexus.example.com";
+    private static final String REPOSITORY = "my-repository";
+    private static final String PROTOCOL = "https";
 
     @Test
-    public void testToArtifact() {
-        Artifact result = Utils.toArtifact(artifact, groupId, version, artifactFile);
-        assertThat(result.getArtifactId(), is(artifactId));
-        assertThat(result.getClassifier(), is(classifier));
-        assertThat(result.getVersion(), is(version));
-        assertThat(result.getFile(), is(artifactFile));
+    void testToArtifact() {
+        Artifact result = Utils.toArtifact(ARTIFACT, GROUP_ID, VERSION, ARTIFACT_FILE);
+        assertThat(result.getArtifactId(), is(ARTIFACT_ID));
+        assertThat(result.getClassifier(), is(CLASSIFIER));
+        assertThat(result.getVersion(), is(VERSION));
+        assertThat(result.getFile(), is(ARTIFACT_FILE));
         assertThat(result.getProperties().entrySet(), hasSize(0));
     }
 
     @Test
-    public void testUploadArtifactsEmptyURL() throws Exception {
-        TaskListener Listener = TaskListener.NULL;
+    void testUploadArtifactsEmptyURL() throws Exception {
         String resolvedNexusUrl = "";
         Artifact[] artifacts = null;
-        assertFalse(Utils.uploadArtifacts(Listener, "", "", "", resolvedNexusUrl, "", "", artifacts));
+        assertFalse(Utils.uploadArtifacts(TASK_LISTENER, "", "", "", resolvedNexusUrl, "", "", artifacts));
     }
 
-    private final TaskListener listener = TaskListener.NULL;
-    private final String username = "userName";
-    private final String password = "password";
-    private final String hostname = "nexus.example.com";
-    private final String repository = "my-repository";
-    private final String protocol = "https";
-
     @Test
-    public void testUploadArtifactsNexus2Throws() throws Exception {
+    void testUploadArtifactsNexus2Throws() {
         String nexusVersion = "nexus2";
-        Artifact[] artifacts = {Utils.toArtifact(artifact, groupId, version, artifactFile),};
-        IOException e = assertThrows(IOException.class, () -> {
-            Utils.uploadArtifacts(listener, username, password, hostname, repository, protocol, nexusVersion, artifacts);
-        });
+        Artifact[] artifacts = { Utils.toArtifact(ARTIFACT, GROUP_ID, VERSION, ARTIFACT_FILE) };
+        IOException e = assertThrows(IOException.class, () ->
+            Utils.uploadArtifacts(TASK_LISTENER, USER_NAME, PASSWORD, HOSTNAME, REPOSITORY, PROTOCOL, nexusVersion, artifacts));
         assertThat(e.getMessage(), containsString("Failed to deploy artifacts: "
                 + "Could not transfer artifact my-groupId:my-id:a-type:test:0.0.1 "
                 + "from/to my-repository (https://nexus.example.com/content/repositories/my-repository): "
@@ -88,12 +85,11 @@ public class UtilsTest {
     }
 
     @Test
-    public void testUploadArtifactsNexus3Throws() throws Exception {
+    void testUploadArtifactsNexus3Throws() {
         String nexusVersion = "nexus3";
-        Artifact[] artifacts = {Utils.toArtifact(artifact, groupId, version, artifactFile),};
-        IOException e = assertThrows(IOException.class, () -> {
-            Utils.uploadArtifacts(listener, username, password, hostname, repository, protocol, nexusVersion, artifacts);
-        });
+        Artifact[] artifacts = { Utils.toArtifact(ARTIFACT, GROUP_ID, VERSION, ARTIFACT_FILE) };
+        IOException e = assertThrows(IOException.class, () ->
+            Utils.uploadArtifacts(TASK_LISTENER, USER_NAME, PASSWORD, HOSTNAME, REPOSITORY, PROTOCOL, nexusVersion, artifacts));
         assertThat(e.getMessage(), containsString("Failed to deploy artifacts: "
                 + "Could not transfer artifact my-groupId:my-id:a-type:test:0.0.1 "
                 + "from/to my-repository (https://nexus.example.com/repository/my-repository): "
