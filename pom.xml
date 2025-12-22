@@ -23,7 +23,7 @@
         <hpi.bundledArtifacts>aether-api,aether-connector-asynchttpclient,aether-connector-file,aether-connector-wagon,aether-impl,aether-spi,aether-util,async-http-client,javax.inject,maven-aether-provider,maven-builder-support,maven-model,maven-model-builder,maven-repository-metadata,maven-settings,maven-settings-builder,netty,plexus-cipher,plexus-classworlds,plexus-component-annotations,plexus-interpolation,plexus-sec-dispatcher,plexus-utils,sisu-inject-bean,sisu-inject-plexus,wagon-http,wagon-http-shared,wagon-provider-api</hpi.bundledArtifacts>
         <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
         <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
-        <maven.version>3.9.6</maven.version>
+        <maven.version>3.9.12</maven.version>
         <wagon.version>3.5.3</wagon.version>
     </properties>
 
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
