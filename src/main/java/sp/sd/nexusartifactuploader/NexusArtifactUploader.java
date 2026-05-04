@@ -1,5 +1,14 @@
 package sp.sd.nexusartifactuploader;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.google.common.base.Strings;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.*;
 import hudson.model.*;
 import hudson.remoting.Callable;
@@ -7,13 +16,8 @@ import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
-import hudson.util.Secret;
 import hudson.util.ListBoxModel;
-import jenkins.tasks.SimpleBuildStep;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-
+import hudson.util.Secret;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -22,18 +26,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-
+import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.remoting.RoleChecker;
-import com.cloudbees.plugins.credentials.CredentialsMatchers;
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.common.StandardCredentials;
-import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
-import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.google.common.base.Strings;
-
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 public class NexusArtifactUploader extends Builder implements SimpleBuildStep, Serializable {
     private static final long serialVersionUID = 1;
@@ -51,8 +48,15 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
-    public NexusArtifactUploader(String nexusVersion, String protocol, String nexusUrl, String groupId,
-                                 String version, String repository, String credentialsId, List<Artifact> artifacts) {
+    public NexusArtifactUploader(
+            String nexusVersion,
+            String protocol,
+            String nexusUrl,
+            String groupId,
+            String version,
+            String repository,
+            String credentialsId,
+            List<Artifact> artifacts) {
         this.nexusVersion = nexusVersion;
         this.protocol = protocol;
         this.nexusUrl = nexusUrl;
@@ -113,10 +117,9 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
 
     public static StandardUsernameCredentials lookupSystemCredentials(String credentialsId, Item project) {
         return CredentialsMatchers.firstOrNull(
-                CredentialsProvider
-                        .lookupCredentials(StandardUsernameCredentials.class, project, ACL.SYSTEM, Collections.emptyList()),
-                CredentialsMatchers.withId(credentialsId)
-        );
+                CredentialsProvider.lookupCredentials(
+                        StandardUsernameCredentials.class, project, ACL.SYSTEM, Collections.emptyList()),
+                CredentialsMatchers.withId(credentialsId));
     }
 
     public String getUsername(EnvVars environment, Item project) {
@@ -130,13 +133,16 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
     public String getPassword(EnvVars environment, Item project) {
         String Password = "";
         if (!Strings.isNullOrEmpty(credentialsId)) {
-            Password = Secret.toString(StandardUsernamePasswordCredentials.class.cast(this.getCredentials(project)).getPassword());
+            Password = Secret.toString(StandardUsernamePasswordCredentials.class
+                    .cast(this.getCredentials(project))
+                    .getPassword());
         }
         return Password;
     }
 
     @Override
-    public void perform(Run build, FilePath workspace, Launcher launcher, final TaskListener listener) throws IOException, InterruptedException {
+    public void perform(Run build, FilePath workspace, Launcher launcher, final TaskListener listener)
+            throws IOException, InterruptedException {
         final EnvVars envVars = build.getEnvironment(listener);
         final Item project = build.getParent();
         final String username = getUsername(envVars, project);
@@ -147,7 +153,8 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
         final String expandedGroupId = envVars.expand(getGroupId());
 
         if (artifacts == null || artifacts.size() == 0) {
-            throw new IOException("No artifacts defined. Artifacts must be defined in addition to group id. See https://plugins.jenkins.io/nexus-artifact-uploader");
+            throw new IOException(
+                    "No artifacts defined. Artifacts must be defined in addition to group id. See https://plugins.jenkins.io/nexus-artifact-uploader");
         }
 
         final Map<Artifact, File> artifactToFile = new LinkedHashMap<>();
@@ -161,7 +168,8 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
 
             @Override
             public Boolean call() throws IOException {
-                final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts = new ArrayList<>(artifactToFile.size());
+                final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts =
+                        new ArrayList<>(artifactToFile.size());
                 for (final Map.Entry<Artifact, File> entry : artifactToFile.entrySet()) {
                     Artifact artifact = entry.getKey();
                     File file = entry.getValue();
@@ -172,15 +180,19 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
                         nexusArtifacts.add(Utils.toArtifact(artifact, expandedGroupId, expandedVersion, file));
                     }
                 }
-                return Utils.uploadArtifacts(listener, username, password,
-                        nexusUrl, repository, protocol, nexusVersion,
+                return Utils.uploadArtifacts(
+                        listener,
+                        username,
+                        password,
+                        nexusUrl,
+                        repository,
+                        protocol,
+                        nexusVersion,
                         nexusArtifacts.toArray(new org.sonatype.aether.artifact.Artifact[0]));
             }
 
             @Override
-            public void checkRoles(RoleChecker checker) throws SecurityException {
-
-            }
+            public void checkRoles(RoleChecker checker) throws SecurityException {}
         });
     }
 
@@ -237,7 +249,10 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
             if (owner == null || !owner.hasPermission(Item.CONFIGURE)) {
                 return new ListBoxModel();
             }
-            return new StandardUsernameListBoxModel().withEmptySelection().withAll(CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials.class, owner, ACL.SYSTEM, Collections.emptyList()));
+            return new StandardUsernameListBoxModel()
+                    .withEmptySelection()
+                    .withAll(CredentialsProvider.lookupCredentials(
+                            StandardUsernamePasswordCredentials.class, owner, ACL.SYSTEM, Collections.emptyList()));
         }
 
         public ListBoxModel doFillNexusVersionItems() {
@@ -254,6 +269,4 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
             return items;
         }
     }
-
 }
-

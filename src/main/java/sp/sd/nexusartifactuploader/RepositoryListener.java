@@ -8,8 +8,7 @@ import org.sonatype.aether.RepositoryEvent;
 public class RepositoryListener extends AbstractRepositoryListener {
     Logger logger = LoggerFactory.getLogger(RepositoryListener.class);
 
-    public RepositoryListener() {
-    }
+    public RepositoryListener() {}
 
     public void artifactDeployed(RepositoryEvent event) {
         logger.info("Deployed " + event.getArtifact() + " to " + event.getRepository());

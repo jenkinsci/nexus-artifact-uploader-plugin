@@ -1,14 +1,13 @@
 package sp.sd.nexusartifactuploader.dsl;
 
+import static javaposse.jobdsl.plugin.ContextExtensionPoint.executeInContext;
+
 import groovy.lang.Closure;
+import java.util.ArrayList;
+import java.util.List;
 import javaposse.jobdsl.dsl.Context;
 import javaposse.jobdsl.dsl.DslContext;
 import sp.sd.nexusartifactuploader.Artifact;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static javaposse.jobdsl.plugin.ContextExtensionPoint.executeInContext;
 
 /**
  * Created by suresh on 9/29/2016.

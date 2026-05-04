@@ -27,5 +27,4 @@ public class ArtifactJobDslContext implements Context {
     void file(String file) {
         this.file = file;
     }
-
 }

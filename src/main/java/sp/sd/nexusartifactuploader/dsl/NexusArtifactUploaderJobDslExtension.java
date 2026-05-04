@@ -51,6 +51,14 @@ public class NexusArtifactUploaderJobDslExtension extends ContextExtensionPoint 
         NexusArtifactUploaderJobDslContext context = new NexusArtifactUploaderJobDslContext();
         executeInContext(closure, context);
 
-        return new NexusArtifactUploader(context.nexusVersion, context.protocol, context.nexusUrl, context.groupId, context.version, context.repository, context.credentialsId, context.artifactList);
+        return new NexusArtifactUploader(
+                context.nexusVersion,
+                context.protocol,
+                context.nexusUrl,
+                context.groupId,
+                context.version,
+                context.repository,
+                context.credentialsId,
+                context.artifactList);
     }
 }

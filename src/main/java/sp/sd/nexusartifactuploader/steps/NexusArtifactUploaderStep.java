@@ -10,12 +10,9 @@ import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.google.common.base.Strings;
-import hudson.*;
-
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import javax.inject.Inject;
-
+import hudson.*;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -24,6 +21,14 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -34,14 +39,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import sp.sd.nexusartifactuploader.Artifact;
 import sp.sd.nexusartifactuploader.Utils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public final class NexusArtifactUploaderStep extends AbstractStepImpl {
 
@@ -57,8 +54,15 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
     private final String credentialsId;
 
     @DataBoundConstructor
-    public NexusArtifactUploaderStep(String nexusVersion, String protocol, String nexusUrl, String groupId,
-                                     String version, String repository, String credentialsId, List<Artifact> artifacts) {
+    public NexusArtifactUploaderStep(
+            String nexusVersion,
+            String protocol,
+            String nexusUrl,
+            String groupId,
+            String version,
+            String repository,
+            String credentialsId,
+            List<Artifact> artifacts) {
         this.nexusVersion = nexusVersion;
         this.protocol = protocol;
         this.nexusUrl = nexusUrl;
@@ -119,10 +123,9 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
 
     public static StandardUsernameCredentials lookupSystemCredentials(String credentialsId, Item project) {
         return CredentialsMatchers.firstOrNull(
-                CredentialsProvider
-                        .lookupCredentials(StandardUsernameCredentials.class, project, ACL.SYSTEM, Collections.emptyList()),
-                CredentialsMatchers.withId(credentialsId)
-        );
+                CredentialsProvider.lookupCredentials(
+                        StandardUsernameCredentials.class, project, ACL.SYSTEM, Collections.emptyList()),
+                CredentialsMatchers.withId(credentialsId));
     }
 
     public String getUsername(EnvVars environment, Item project) {
@@ -136,7 +139,9 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
     public String getPassword(EnvVars environment, Item project) {
         String Password = "";
         if (!Strings.isNullOrEmpty(credentialsId)) {
-            Password = Secret.toString(StandardUsernamePasswordCredentials.class.cast(this.getCredentials(project)).getPassword());
+            Password = Secret.toString(StandardUsernamePasswordCredentials.class
+                    .cast(this.getCredentials(project))
+                    .getPassword());
         }
         return Password;
     }
@@ -195,7 +200,10 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
             if (owner == null || !owner.hasPermission(Item.CONFIGURE)) {
                 return new ListBoxModel();
             }
-            return new StandardUsernameListBoxModel().withEmptySelection().withAll(CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials.class, owner, ACL.SYSTEM, Collections.emptyList()));
+            return new StandardUsernameListBoxModel()
+                    .withEmptySelection()
+                    .withAll(CredentialsProvider.lookupCredentials(
+                            StandardUsernamePasswordCredentials.class, owner, ACL.SYSTEM, Collections.emptyList()));
         }
 
         public ListBoxModel doFillNexusVersionItems() {
@@ -257,7 +265,8 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
 
                 @Override
                 public Boolean call() throws Exception {
-                    final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts = new ArrayList<>(artifactToFile.size());
+                    final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts =
+                            new ArrayList<>(artifactToFile.size());
                     for (final Map.Entry<Artifact, File> entry : artifactToFile.entrySet()) {
                         Artifact artifact = entry.getKey();
                         File file = entry.getValue();
@@ -268,15 +277,19 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
                             nexusArtifacts.add(Utils.toArtifact(artifact, groupId, version, file));
                         }
                     }
-                    return Utils.uploadArtifacts(listener, username, password,
-                            nexusUrl, repository, protocol, nexusVersion,
+                    return Utils.uploadArtifacts(
+                            listener,
+                            username,
+                            password,
+                            nexusUrl,
+                            repository,
+                            protocol,
+                            nexusVersion,
                             nexusArtifacts.toArray(new org.sonatype.aether.artifact.Artifact[0]));
                 }
 
                 @Override
-                public void checkRoles(RoleChecker checker) throws SecurityException {
-
-                }
+                public void checkRoles(RoleChecker checker) throws SecurityException {}
             });
         }
     }

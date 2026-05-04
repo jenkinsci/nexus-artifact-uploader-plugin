@@ -1,6 +1,7 @@
 package sp.sd.nexusartifactuploader;
 
 import hudson.model.TaskListener;
+import java.io.File;
 import org.apache.maven.repository.internal.*;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
@@ -20,8 +21,6 @@ import org.sonatype.aether.impl.VersionResolver;
 import org.sonatype.aether.impl.internal.DefaultServiceLocator;
 import org.sonatype.aether.repository.*;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
-
-import java.io.File;
 
 public class ArtifactRepositoryManager {
 
@@ -51,8 +50,7 @@ public class ArtifactRepositoryManager {
                 .setAuthentication(new Authentication(this.username, this.password));
     }
 
-    public void upload(Artifact... artifacts)
-            throws Exception {
+    public void upload(Artifact... artifacts) throws Exception {
         RemoteRepository remoteRepository = makeRemoteRepository();
         DeployRequest deployRequest = new DeployRequest();
         for (Artifact artifact : artifacts) {
@@ -60,13 +58,11 @@ public class ArtifactRepositoryManager {
         }
         deployRequest.setRepository(remoteRepository);
 
-        final SettingsBuildingRequest request = new DefaultSettingsBuildingRequest()
-                .setSystemProperties(System.getProperties());
+        final SettingsBuildingRequest request =
+                new DefaultSettingsBuildingRequest().setSystemProperties(System.getProperties());
 
-        Settings settings = new DefaultSettingsBuilderFactory()
-                .newInstance()
-                .build(request)
-                .getEffectiveSettings();
+        Settings settings =
+                new DefaultSettingsBuilderFactory().newInstance().build(request).getEffectiveSettings();
 
         repositorySystem = new DefaultServiceLocator()
                 .addService(RepositoryConnectorFactory.class, FileRepositoryConnectorFactory.class)
@@ -94,4 +90,3 @@ public class ArtifactRepositoryManager {
         repositorySystem.deploy(session, deployRequest);
     }
 }
-

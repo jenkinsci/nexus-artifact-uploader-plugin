@@ -1,20 +1,19 @@
 package sp.sd.nexusartifactuploader;
 
+import hudson.model.TaskListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import hudson.model.TaskListener;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.transfer.AbstractTransferListener;
 import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferResource;
-import org.apache.commons.lang3.Validate;
 
 public class TransferListener extends AbstractTransferListener {
     Logger logger = LoggerFactory.getLogger(TransferListener.class);
@@ -131,8 +130,11 @@ public class TransferListener extends AbstractTransferListener {
 
         public String formatProgress(long progressedSize, long size) {
             Validate.isTrue(progressedSize >= 0L, "Progressed file size cannot be negative: %s", progressedSize);
-            Validate.isTrue(size < 0L || progressedSize <= size,
-                    "Progressed file size cannot be bigger than size: %s > %s", progressedSize, size);
+            Validate.isTrue(
+                    size < 0L || progressedSize <= size,
+                    "Progressed file size cannot be bigger than size: %s > %s",
+                    progressedSize,
+                    size);
 
             if (size >= 0 && progressedSize != size) {
                 ScaleUnit unit = ScaleUnit.getScaleUnit(size);
@@ -159,11 +161,11 @@ public class TransferListener extends AbstractTransferListener {
     }
 
     @Override
-    public void transferCorrupted(TransferEvent event)
-            throws TransferCancelledException {
+    public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
-        Listener.getLogger().println("[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
-                + resource.getResourceName());
+        Listener.getLogger()
+                .println("[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
+                        + resource.getResourceName());
     }
 
     @Override
@@ -181,8 +183,9 @@ public class TransferListener extends AbstractTransferListener {
             double bytesPerSecond = contentLength / (duration / 1000.0);
             throughput = " at " + format.format((long) bytesPerSecond) + "/s";
         }
-        Listener.getLogger().println(type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-                + throughput + ")");
+        Listener.getLogger()
+                .println(type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
+                        + throughput + ")");
     }
 
     int lastPercentage = 0;

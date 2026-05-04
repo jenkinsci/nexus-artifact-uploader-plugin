@@ -1,15 +1,14 @@
 package sp.sd.nexusartifactuploader;
 
+import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
+import java.io.Serializable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
-import edu.umd.cs.findbugs.annotations.CheckReturnValue;
-import java.io.Serializable;
 
 /**
  * Created by suresh on 10/15/2016.
@@ -17,7 +16,7 @@ import java.io.Serializable;
 public class Artifact extends AbstractDescribableImpl<Artifact> implements Serializable {
 
     private static final long serialVersionUID = 1905162041950251407L;
-    
+
     private final String artifactId;
     private final String type;
     private final String classifier;
@@ -37,8 +36,7 @@ public class Artifact extends AbstractDescribableImpl<Artifact> implements Seria
     @CheckReturnValue
     public Artifact expandVars(EnvVars envVars) {
         return new Artifact(
-            envVars.expand(artifactId), envVars.expand(type), envVars.expand(classifier), envVars.expand(file)
-        );
+                envVars.expand(artifactId), envVars.expand(type), envVars.expand(classifier), envVars.expand(file));
     }
 
     public String getArtifactId() {

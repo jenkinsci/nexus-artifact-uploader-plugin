@@ -12,7 +12,5 @@ public class ManualWagonProvider implements WagonProvider {
     }
 
     @Override
-    public void release(Wagon arg0) {
-
-    }
+    public void release(Wagon arg0) {}
 }

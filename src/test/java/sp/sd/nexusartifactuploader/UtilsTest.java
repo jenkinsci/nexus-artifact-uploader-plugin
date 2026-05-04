@@ -23,11 +23,6 @@
  */
 package sp.sd.nexusartifactuploader;
 
-import hudson.model.TaskListener;
-import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
@@ -35,6 +30,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import hudson.model.TaskListener;
+import java.io.File;
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
 import org.sonatype.aether.artifact.Artifact;
 
 class UtilsTest {
@@ -43,7 +42,8 @@ class UtilsTest {
     private static final String CLASSIFIER = "test";
     private static final String ARTIFACT_TYPE = "a-type";
     private static final String FILE_NAME = "my-file";
-    private static final sp.sd.nexusartifactuploader.Artifact ARTIFACT = new sp.sd.nexusartifactuploader.Artifact(ARTIFACT_ID, ARTIFACT_TYPE, CLASSIFIER, FILE_NAME);
+    private static final sp.sd.nexusartifactuploader.Artifact ARTIFACT =
+            new sp.sd.nexusartifactuploader.Artifact(ARTIFACT_ID, ARTIFACT_TYPE, CLASSIFIER, FILE_NAME);
     private static final String GROUP_ID = "my-groupId";
     private static final String VERSION = "0.0.1";
     private static final File ARTIFACT_FILE = new File(".");
@@ -75,24 +75,34 @@ class UtilsTest {
     @Test
     void testUploadArtifactsNexus2Throws() {
         String nexusVersion = "nexus2";
-        Artifact[] artifacts = { Utils.toArtifact(ARTIFACT, GROUP_ID, VERSION, ARTIFACT_FILE) };
-        IOException e = assertThrows(IOException.class, () ->
-            Utils.uploadArtifacts(TASK_LISTENER, USER_NAME, PASSWORD, HOSTNAME, REPOSITORY, PROTOCOL, nexusVersion, artifacts));
-        assertThat(e.getMessage(), containsString("Failed to deploy artifacts: "
-                + "Could not transfer artifact my-groupId:my-id:a-type:test:0.0.1 "
-                + "from/to my-repository (https://nexus.example.com/content/repositories/my-repository): "
-                + "transfer failed for https://nexus.example.com/content/repositories/my-repository/my-groupId/my-id/0.0.1/my-id-0.0.1-test.a-type"));
+        Artifact[] artifacts = {Utils.toArtifact(ARTIFACT, GROUP_ID, VERSION, ARTIFACT_FILE)};
+        IOException e = assertThrows(
+                IOException.class,
+                () -> Utils.uploadArtifacts(
+                        TASK_LISTENER, USER_NAME, PASSWORD, HOSTNAME, REPOSITORY, PROTOCOL, nexusVersion, artifacts));
+        assertThat(
+                e.getMessage(),
+                containsString(
+                        "Failed to deploy artifacts: "
+                                + "Could not transfer artifact my-groupId:my-id:a-type:test:0.0.1 "
+                                + "from/to my-repository (https://nexus.example.com/content/repositories/my-repository): "
+                                + "transfer failed for https://nexus.example.com/content/repositories/my-repository/my-groupId/my-id/0.0.1/my-id-0.0.1-test.a-type"));
     }
 
     @Test
     void testUploadArtifactsNexus3Throws() {
         String nexusVersion = "nexus3";
-        Artifact[] artifacts = { Utils.toArtifact(ARTIFACT, GROUP_ID, VERSION, ARTIFACT_FILE) };
-        IOException e = assertThrows(IOException.class, () ->
-            Utils.uploadArtifacts(TASK_LISTENER, USER_NAME, PASSWORD, HOSTNAME, REPOSITORY, PROTOCOL, nexusVersion, artifacts));
-        assertThat(e.getMessage(), containsString("Failed to deploy artifacts: "
-                + "Could not transfer artifact my-groupId:my-id:a-type:test:0.0.1 "
-                + "from/to my-repository (https://nexus.example.com/repository/my-repository): "
-                + "transfer failed for https://nexus.example.com/repository/my-repository/my-groupId/my-id/0.0.1/my-id-0.0.1-test.a-type"));
+        Artifact[] artifacts = {Utils.toArtifact(ARTIFACT, GROUP_ID, VERSION, ARTIFACT_FILE)};
+        IOException e = assertThrows(
+                IOException.class,
+                () -> Utils.uploadArtifacts(
+                        TASK_LISTENER, USER_NAME, PASSWORD, HOSTNAME, REPOSITORY, PROTOCOL, nexusVersion, artifacts));
+        assertThat(
+                e.getMessage(),
+                containsString(
+                        "Failed to deploy artifacts: "
+                                + "Could not transfer artifact my-groupId:my-id:a-type:test:0.0.1 "
+                                + "from/to my-repository (https://nexus.example.com/repository/my-repository): "
+                                + "transfer failed for https://nexus.example.com/repository/my-repository/my-groupId/my-id/0.0.1/my-id-0.0.1-test.a-type"));
     }
 }
