@@ -30,6 +30,7 @@ import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 public class NexusArtifactUploader extends Builder implements SimpleBuildStep, Serializable {
@@ -45,6 +46,14 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
 
     @CheckForNull
     private final String credentialsId;
+
+    /**
+     * Opt-in confirmation of the download URLs through the Nexus 3 search API, off by default.
+     *
+     * <p>Not a constructor parameter so that existing {@code config.xml} files keep loading
+     * unchanged and the field simply defaults to false.
+     */
+    private boolean verifyUploads;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
@@ -98,6 +107,15 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
     @Nullable
     public String getCredentialsId() {
         return credentialsId;
+    }
+
+    public boolean isVerifyUploads() {
+        return verifyUploads;
+    }
+
+    @DataBoundSetter
+    public void setVerifyUploads(boolean verifyUploads) {
+        this.verifyUploads = verifyUploads;
     }
 
     public StandardUsernameCredentials getCredentials(Item project) {
@@ -163,11 +181,11 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
             artifactToFile.put(artifact.expandVars(envVars), new File(artifactFilePath.getRemote()));
         }
 
-        workspace.act(new Callable<Boolean, IOException>() {
+        NexusUploadResult result = workspace.act(new Callable<NexusUploadResult, IOException>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Boolean call() throws IOException {
+            public NexusUploadResult call() throws IOException {
                 final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts =
                         new ArrayList<>(artifactToFile.size());
                 for (final Map.Entry<Artifact, File> entry : artifactToFile.entrySet()) {
@@ -180,7 +198,7 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
                         nexusArtifacts.add(Utils.toArtifact(artifact, expandedGroupId, expandedVersion, file));
                     }
                 }
-                return Utils.uploadArtifacts(
+                return Utils.uploadArtifactsWithResult(
                         listener,
                         username,
                         password,
@@ -194,6 +212,36 @@ public class NexusArtifactUploader extends Builder implements SimpleBuildStep, S
             @Override
             public void checkRoles(RoleChecker checker) throws SecurityException {}
         });
+
+        if (verifyUploads) {
+            NexusSearchClient searchClient =
+                    new NexusSearchClient(protocol, nexusUrl, nexusVersion, repository, username, password);
+            result = result.withArtifacts(searchClient.verify(result.getArtifacts(), listener));
+        }
+        recordOnBuild(build, result, listener);
+    }
+
+    /**
+     * Records the URLs on the build: an action for the build page and side bar, and an environment
+     * contribution so that later build steps of the same Freestyle job can read
+     * {@code $NEXUS_ARTIFACT_URL} and friends.
+     *
+     * <p>Deliberately swallows its own errors. The upload has already succeeded when this runs, so
+     * turning a bookkeeping problem into a build failure would report the wrong thing.
+     */
+    private static void recordOnBuild(Run<?, ?> build, NexusUploadResult result, TaskListener listener) {
+        if (build == null || result == null || result.getArtifacts().isEmpty()) {
+            return;
+        }
+        try {
+            build.addAction(new NexusUploadBuildAction(result.getRepositoryUrl(), result.getArtifacts()));
+            NexusUploadEnvAction.contribute(build, result.getUrls());
+            build.save();
+        } catch (Exception e) {
+            listener.getLogger()
+                    .println("[nexus-artifact-uploader] Uploaded successfully but could not record the URLs on the "
+                            + "build (" + e.getClass().getSimpleName() + ": " + e.getMessage() + ").");
+        }
     }
 
     @Override

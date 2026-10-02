@@ -1,0 +1,16 @@
+<div>
+  Ask Nexus where each artifact actually ended up, using the Nexus 3 search API, instead of relying
+  only on the URLs seen during the upload.
+  <p>
+    Leave this off unless you need it. The URLs observed during the transfer are already exact, so
+    verification mainly costs an extra HTTP request per artifact. It is worth enabling when the
+    published file name is assigned by the server (SNAPSHOT versions) and you want the stored name
+    confirmed rather than derived.
+  </p>
+  <p>
+    The query is issued by the Jenkins controller, not by the agent. If Nexus is only reachable from
+    the agent network, verification will log a warning and the unverified URL is kept &mdash; the
+    build is never failed for this, because the upload itself has already succeeded.
+    Requires Nexus 3; ignored for Nexus 2.
+  </p>
+</div>

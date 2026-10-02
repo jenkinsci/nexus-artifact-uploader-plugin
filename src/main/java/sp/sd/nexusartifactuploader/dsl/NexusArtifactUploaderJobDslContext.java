@@ -20,6 +20,7 @@ public class NexusArtifactUploaderJobDslContext implements Context {
     String version;
     String repository;
     String credentialsId;
+    boolean verifyUploads;
     List<Artifact> artifactList = new ArrayList<>();
 
     void nexusVersion(String nexusVersion) {
@@ -48,6 +49,10 @@ public class NexusArtifactUploaderJobDslContext implements Context {
 
     void credentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
+    }
+
+    void verifyUploads(boolean verifyUploads) {
+        this.verifyUploads = verifyUploads;
     }
 
     void artifact(@DslContext(ArtifactJobDslContext.class) Closure artifactClosure) {
