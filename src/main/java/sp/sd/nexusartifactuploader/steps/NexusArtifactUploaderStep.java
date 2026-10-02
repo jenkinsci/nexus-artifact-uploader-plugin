@@ -36,8 +36,13 @@ import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import sp.sd.nexusartifactuploader.Artifact;
+import sp.sd.nexusartifactuploader.NexusSearchClient;
+import sp.sd.nexusartifactuploader.NexusUploadBuildAction;
+import sp.sd.nexusartifactuploader.NexusUploadEnvAction;
+import sp.sd.nexusartifactuploader.NexusUploadResult;
 import sp.sd.nexusartifactuploader.Utils;
 
 public final class NexusArtifactUploaderStep extends AbstractStepImpl {
@@ -52,6 +57,16 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
 
     @CheckForNull
     private final String credentialsId;
+
+    /**
+     * Opt-in confirmation of the download URLs through the Nexus 3 search API, off by default.
+     *
+     * <p>Off by default on purpose: the query runs from the controller and costs an extra HTTP
+     * round trip per artifact, which is wasted work when the URLs observed during the transfer are
+     * already exact. Turn it on when the controller can reach Nexus and you want the URLs
+     * cross-checked against what the server actually stored.
+     */
+    private boolean verifyUploads;
 
     @DataBoundConstructor
     public NexusArtifactUploaderStep(
@@ -104,6 +119,15 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
     @Nullable
     public String getCredentialsId() {
         return credentialsId;
+    }
+
+    public boolean isVerifyUploads() {
+        return verifyUploads;
+    }
+
+    @DataBoundSetter
+    public void setVerifyUploads(boolean verifyUploads) {
+        this.verifyUploads = verifyUploads;
     }
 
     public StandardUsernameCredentials getCredentials(Item project) {
@@ -260,11 +284,11 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
                 artifactToFile.put(artifact.expandVars(envVars), new File(artifactFilePath.getRemote()));
             }
 
-            return ws.act(new Callable<Boolean, Exception>() {
+            NexusUploadResult result = ws.act(new Callable<NexusUploadResult, Exception>() {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public Boolean call() throws Exception {
+                public NexusUploadResult call() throws Exception {
                     final List<org.sonatype.aether.artifact.Artifact> nexusArtifacts =
                             new ArrayList<>(artifactToFile.size());
                     for (final Map.Entry<Artifact, File> entry : artifactToFile.entrySet()) {
@@ -277,7 +301,7 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
                             nexusArtifacts.add(Utils.toArtifact(artifact, groupId, version, file));
                         }
                     }
-                    return Utils.uploadArtifacts(
+                    return Utils.uploadArtifactsWithResult(
                             listener,
                             username,
                             password,
@@ -291,6 +315,35 @@ public final class NexusArtifactUploaderStep extends AbstractStepImpl {
                 @Override
                 public void checkRoles(RoleChecker checker) throws SecurityException {}
             });
+
+            if (step.isVerifyUploads()) {
+                NexusSearchClient searchClient =
+                        new NexusSearchClient(protocol, nexusUrl, nexusVersion, repository, username, password);
+                result = result.withArtifacts(searchClient.verify(result.getArtifacts(), listener));
+            }
+
+            recordOnBuild(result);
+            return result.isSuccess();
+        }
+
+        /**
+         * Persists the outcome on the build: a visible action listing the URLs and an environment
+         * contribution. Neither is allowed to fail the step, because at this point the artifacts
+         * are already in Nexus and failing would misreport a successful upload.
+         */
+        private void recordOnBuild(NexusUploadResult result) {
+            if (result == null || result.getArtifacts().isEmpty()) {
+                return;
+            }
+            try {
+                build.addAction(new NexusUploadBuildAction(result.getRepositoryUrl(), result.getArtifacts()));
+                NexusUploadEnvAction.contribute(build, result.getUrls());
+                build.save();
+            } catch (Exception e) {
+                listener.getLogger()
+                        .println("[nexus-artifact-uploader] Uploaded successfully but could not record the URLs on "
+                                + "the build (" + e.getClass().getSimpleName() + ": " + e.getMessage() + ").");
+            }
         }
     }
 }
