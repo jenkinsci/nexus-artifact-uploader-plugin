@@ -1,0 +1,40 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:t="/lib/hudson">
+  <l:layout title="${%Nexus artifacts}">
+    <st:include page="sidepanel.jelly" it="${it.run}" optional="true"/>
+    <l:main-panel>
+      <h1>${%Nexus artifacts}</h1>
+      <table class="jenkins-table sortable">
+        <thead>
+          <tr>
+            <th>${%Repository}</th>
+            <th>${%Artifact}</th>
+            <th>${%Version}</th>
+            <th>${%Classifier}</th>
+            <th>${%Type}</th>
+            <th>${%URL}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <j:forEach var="artifact" items="${it.buildArtifacts}">
+            <tr>
+              <td>${artifact.repository}</td>
+              <td>${artifact.groupId}:${artifact.artifactId}</td>
+              <td>${artifact.version}</td>
+              <td>${artifact.classifier}</td>
+              <td>${artifact.type}</td>
+              <td>
+                <a href="${artifact.linkUrl}" rel="noopener noreferrer">${artifact.fileName}</a>
+                <j:if test="${!artifact.verified}">
+                  <!-- Shown when the URL was computed from the coordinates rather than observed
+                       during the transfer, which happens for snapshots when verification is off. -->
+                  <span style="color: var(--warning-color, #c6884b);">&#160;(${%unconfirmed})</span>
+                </j:if>
+              </td>
+            </tr>
+          </j:forEach>
+        </tbody>
+      </table>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

@@ -1,0 +1,13 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:t="/lib/hudson">
+  <j:if test="${it.primary}">
+    <t:summary icon="/plugin/nexus-artifact-uploader/images/nexus-artifacts.svg">
+      <a href="${it.urlName}">${%Nexus artifacts}</a>
+      <ul>
+        <j:forEach var="artifact" items="${it.buildArtifacts}">
+          <li><a href="${artifact.linkUrl}" rel="noopener noreferrer">${artifact.url}</a></li>
+        </j:forEach>
+      </ul>
+    </t:summary>
+  </j:if>
+</j:jelly>

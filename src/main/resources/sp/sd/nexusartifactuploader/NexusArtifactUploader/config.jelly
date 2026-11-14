@@ -26,5 +26,10 @@
         <f:entry title="Artifacts">
             <f:repeatableProperty minimum="0" field="artifacts" header="Artifact"/>
         </f:entry>
+        <f:advanced>
+            <f:entry title="Verify download URLs" field="verifyUploads">
+                <f:checkbox/>
+            </f:entry>
+        </f:advanced>
     </f:section>
 </j:jelly>

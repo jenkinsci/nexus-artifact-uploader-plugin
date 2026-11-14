@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
+     fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+     stroke-linejoin="round" role="img" aria-hidden="true">
+  <!-- Generic package glyph, drawn here so the icon never depends on a core symbol name. -->
+  <path d="M12 2.6 21 7.3v9.4L12 21.4 3 16.7V7.3z"/>
+  <path d="M3 7.3l9 4.7 9-4.7"/>
+  <path d="M12 12v9.4"/>
+</svg>

@@ -3,6 +3,9 @@ package sp.sd.nexusartifactuploader;
 import hudson.model.TaskListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +23,16 @@ public class TransferListener extends AbstractTransferListener {
     private ConcurrentMap<TransferResource, Long> downloads = new ConcurrentHashMap<>();
     private int lastLength;
     private TaskListener Listener;
+
+    /**
+     * URLs of the artifacts that were successfully uploaded, in transfer order.
+     *
+     * <p>This is the authoritative source of "where is the artifact now": the URL is taken from the
+     * transfer itself, so it is correct even for snapshots, whose published file name carries a
+     * server-assigned timestamp that cannot be derived from the coordinates. Checksums, signatures
+     * and {@code maven-metadata.xml} are filtered out.
+     */
+    private final List<String> uploadedUrls = Collections.synchronizedList(new ArrayList<String>());
 
     static class FileSizeFormat {
         enum ScaleUnit {
@@ -183,9 +196,25 @@ public class TransferListener extends AbstractTransferListener {
             double bytesPerSecond = contentLength / (duration / 1000.0);
             throughput = " at " + format.format((long) bytesPerSecond) + "/s";
         }
-        Listener.getLogger()
-                .println(type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-                        + throughput + ")");
+        String url = resource.getRepositoryUrl() + resource.getResourceName();
+        Listener.getLogger().println(type + ": " + url + " (" + len + throughput + ")");
+
+        if (event.getRequestType() == TransferEvent.RequestType.PUT
+                && NexusUrlBuilder.isArtifactResource(resource.getResourceName())) {
+            uploadedUrls.add(url);
+        }
+    }
+
+    /**
+     * Returns an immutable snapshot of the URLs of the artifacts uploaded so far.
+     *
+     * <p>Safe to call after the deploy has finished; the underlying list is synchronized because
+     * Aether may transfer artifacts on more than one thread.
+     */
+    public List<String> getUploadedUrls() {
+        synchronized (uploadedUrls) {
+            return Collections.unmodifiableList(new ArrayList<>(uploadedUrls));
+        }
     }
 
     int lastPercentage = 0;
