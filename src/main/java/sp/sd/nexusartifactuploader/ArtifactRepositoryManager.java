@@ -2,6 +2,8 @@ package sp.sd.nexusartifactuploader;
 
 import hudson.model.TaskListener;
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 import org.apache.maven.repository.internal.*;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
@@ -28,7 +30,6 @@ public class ArtifactRepositoryManager {
     private String username;
     private String password;
     private String repo;
-    private TaskListener Listener;
 
     private static final String USER_HOME = System.getProperty("user.home");
     private static final File MAVEN_USER_HOME = new File(USER_HOME, ".m2");
@@ -36,13 +37,21 @@ public class ArtifactRepositoryManager {
     private RepositorySystem repositorySystem;
     private RepositorySystemSession session;
 
+    /**
+     * Kept as a field so that the URLs observed during the deploy can be read back after
+     * {@link #upload(Artifact...)} returns.
+     */
+    private final sp.sd.nexusartifactuploader.TransferListener transferListener;
+
     public ArtifactRepositoryManager(String url, String username, String password, String repo, TaskListener Listener)
             throws SettingsBuildingException {
         this.url = url;
         this.username = username;
         this.password = password;
         this.repo = repo;
-        this.Listener = Listener;
+        // Created here rather than in upload() so that the URLs it observes can be read back
+        // afterwards; this also removes the need to hold on to the TaskListener separately.
+        this.transferListener = new sp.sd.nexusartifactuploader.TransferListener(Listener);
     }
 
     private RemoteRepository makeRemoteRepository() {
@@ -86,7 +95,22 @@ public class ArtifactRepositoryManager {
         session = new MavenRepositorySystemSession()
                 .setLocalRepositoryManager(localRepositoryManager)
                 .setRepositoryListener(new RepositoryListener())
-                .setTransferListener(new sp.sd.nexusartifactuploader.TransferListener(Listener));
+                .setTransferListener(transferListener);
         repositorySystem.deploy(session, deployRequest);
+    }
+
+    /** Base URL of the target repository, as passed to the constructor. */
+    public String getUrl() {
+        return url;
+    }
+
+    /**
+     * URLs of the artifacts that were actually transferred, in transfer order. Empty before
+     * {@link #upload(Artifact...)} has run.
+     */
+    public List<String> getUploadedUrls() {
+        return transferListener == null
+                ? Collections.<String>emptyList()
+                : transferListener.getUploadedUrls();
     }
 }

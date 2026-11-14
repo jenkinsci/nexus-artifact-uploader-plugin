@@ -25,6 +25,7 @@ import sp.sd.nexusartifactuploader.NexusArtifactUploader;
             version('2.4')
             repository('NexusArtifactUploader')
             credentialsId('44620c50-1589-4617-a677-7563985e46e1')
+            verifyUploads(true)
             artifact {
                 artifactId('nexus-artifact-uploader')
                 type('jar')
@@ -51,7 +52,7 @@ public class NexusArtifactUploaderJobDslExtension extends ContextExtensionPoint 
         NexusArtifactUploaderJobDslContext context = new NexusArtifactUploaderJobDslContext();
         executeInContext(closure, context);
 
-        return new NexusArtifactUploader(
+        NexusArtifactUploader uploader = new NexusArtifactUploader(
                 context.nexusVersion,
                 context.protocol,
                 context.nexusUrl,
@@ -60,5 +61,7 @@ public class NexusArtifactUploaderJobDslExtension extends ContextExtensionPoint 
                 context.repository,
                 context.credentialsId,
                 context.artifactList);
+        uploader.setVerifyUploads(context.verifyUploads);
+        return uploader;
     }
 }
